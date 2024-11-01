@@ -2,7 +2,7 @@ const net = require('net');
 const express = require('express');
 const bodyParser = require('body-parser');
 
-const PORT = 80;
+const PORT = 3000;
 const TCP_PORT = 4000;
 const HOST = '0.0.0.0';
 
