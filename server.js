@@ -28,8 +28,12 @@ function decodeGT06Data(buffer) {
 
   // Decodificar datos específicos del mensaje
   const status = data.readUInt8(0);
-  const latitude = data.readUInt32BE(1) / 1000000; // Ejemplo de decodificación de latitud
-  const longitude = data.readUInt32BE(5) / 1000000; // Ejemplo de decodificación de longitud
+  const latitudeRaw = data.readUInt32BE(1);
+  const longitudeRaw = data.readUInt32BE(5);
+
+  // Convertir los valores decimales a coordenadas GPS
+  const latitude = latitudeRaw / 1000000;
+  const longitude = longitudeRaw / 1000000;
 
   return {
     prefix,
@@ -65,6 +69,9 @@ const tcpServer = net.createServer((socket) => {
       // Convertir los datos decodificados a JSON
       const jsonData = JSON.stringify(decodedData);
       console.log('Datos en formato JSON:', jsonData);
+
+      // Imprimir las coordenadas GPS para verificar en Google Maps
+      console.log(`Coordenadas GPS: https://www.google.com/maps?q=${decodedData.latitude},${decodedData.longitude}`);
     } catch (err) {
       console.error('Error al decodificar los datos del GPS:', err.message);
     }
