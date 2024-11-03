@@ -12,6 +12,25 @@ app.use(bodyParser.json());
 
 let gpsSocket = null;
 
+// Función para decodificar los datos binarios del protocolo GT06
+function decodeGT06Data(buffer) {
+  const prefix = buffer.slice(0, 2).toString('hex');
+  const length = buffer.readUInt8(2);
+  const messageType = buffer.readUInt8(3);
+  const data = buffer.slice(4, 4 + length - 5); // Excluyendo prefijo, longitud, tipo, checksum y sufijo
+  const checksum = buffer.slice(4 + length - 5, 4 + length - 3).toString('hex');
+  const suffix = buffer.slice(4 + length - 3, 4 + length - 1).toString('hex');
+
+  return {
+    prefix,
+    length,
+    messageType,
+    data: data.toString('hex'),
+    checksum,
+    suffix
+  };
+}
+
 // Servidor TCP para el GPS
 const tcpServer = net.createServer((socket) => {
   console.log('GPS conectado desde:', socket.remoteAddress);
@@ -24,6 +43,10 @@ const tcpServer = net.createServer((socket) => {
     // Imprimir los datos en la consola para análisis
     console.log('Datos recibidos del GPS (raw):', data);
     console.log('Datos recibidos del GPS (string):', data.toString());
+
+    // Decodificar los datos binarios del protocolo GT06
+    const decodedData = decodeGT06Data(data);
+    console.log('Datos decodificados del GPS:', decodedData);
   });
 
   socket.on('end', () => {
@@ -53,4 +76,4 @@ app.post('/send-command', (req, res) => {
 
 app.listen(PORT, () => {
   console.log(`Servidor HTTP escuchando en el puerto ${PORT}`);
-});
+})
