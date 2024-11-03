@@ -1,6 +1,6 @@
 const net = require('net');
 
-const PORT = 3000;
+const PORT = 4000;
 
 const server = net.createServer((socket) => {
   console.log('Cliente conectado');
