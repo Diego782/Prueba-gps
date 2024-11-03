@@ -21,31 +21,47 @@ function decodeGT06Data(buffer) {
   const checksum = buffer.slice(4 + length - 5, 4 + length - 3).toString('hex');
   const suffix = buffer.slice(4 + length - 3, 4 + length - 1).toString('hex');
 
-  // Asegurarse de que el buffer tenga suficientes datos
-  if (data.length < 9) {
-    throw new RangeError('El buffer no contiene suficientes datos para decodificar');
+  function decodeGT06Data(buffer) {
+    // Verificar si el buffer es suficientemente largo para leer los primeros datos
+    if (buffer.length < 5) {
+      throw new RangeError('El buffer es demasiado corto para contener datos válidos');
+    }
+  
+    const prefix = buffer.slice(0, 2).toString('hex');
+    const length = buffer.readUInt8(2);
+  
+    // Verificar si el buffer tiene la longitud mínima indicada por el campo de longitud
+    if (buffer.length < length + 2) {
+      throw new RangeError('El buffer no contiene suficientes datos para decodificar');
+    }
+  
+    const messageType = buffer.readUInt8(3);
+    const data = buffer.slice(4, 4 + length - 5); // Excluyendo prefijo, longitud, tipo, checksum y sufijo
+  
+    const checksum = buffer.slice(4 + length - 5, 4 + length - 3).toString('hex');
+    const suffix = buffer.slice(4 + length - 3, 4 + length - 1).toString('hex');
+  
+    // Decodificar datos específicos del mensaje
+    const status = data.readUInt8(0);
+    const latitudeRaw = data.readUInt32BE(1);
+    const longitudeRaw = data.readUInt32BE(5);
+  
+    // Convertir los valores decimales a coordenadas GPS
+    const latitude = latitudeRaw / 1000000;
+    const longitude = longitudeRaw / 1000000;
+  
+    return {
+      prefix,
+      length,
+      messageType,
+      status,
+      latitude,
+      longitude,
+      checksum,
+      suffix
+    };
   }
-
-  // Decodificar datos específicos del mensaje
-  const status = data.readUInt8(0);
-  const latitudeRaw = data.readUInt32BE(1);
-  const longitudeRaw = data.readUInt32BE(5);
-
-  // Convertir los valores decimales a coordenadas GPS
-  const latitude = latitudeRaw / 1000000;
-  const longitude = longitudeRaw / 1000000;
-
-  return {
-    prefix,
-    length,
-    messageType,
-    status,
-    latitude,
-    longitude,
-    checksum,
-    suffix
-  };
-}
+  
 
 // Servidor TCP para el GPS
 const tcpServer = net.createServer((socket) => {
