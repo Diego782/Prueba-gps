@@ -21,6 +21,11 @@ function decodeGT06Data(buffer) {
   const checksum = buffer.slice(4 + length - 5, 4 + length - 3).toString('hex');
   const suffix = buffer.slice(4 + length - 3, 4 + length - 1).toString('hex');
 
+  // Asegurarse de que el buffer tenga suficientes datos
+  if (data.length < 9) {
+    throw new RangeError('El buffer no contiene suficientes datos para decodificar');
+  }
+
   // Decodificar datos específicos del mensaje
   const status = data.readUInt8(0);
   const latitude = data.readUInt32BE(1) / 1000000; // Ejemplo de decodificación de latitud
@@ -52,8 +57,12 @@ const tcpServer = net.createServer((socket) => {
     console.log('Datos recibidos del GPS (string):', data.toString());
 
     // Decodificar los datos binarios del protocolo GT06
-    const decodedData = decodeGT06Data(data);
-    console.log('Datos decodificados del GPS:', decodedData);
+    try {
+      const decodedData = decodeGT06Data(data);
+      console.log('Datos decodificados del GPS:', decodedData);
+    } catch (err) {
+      console.error('Error al decodificar los datos del GPS:', err.message);
+    }
   });
 
   socket.on('end', () => {
