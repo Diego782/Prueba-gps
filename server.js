@@ -21,11 +21,18 @@ function decodeGT06Data(buffer) {
   const checksum = buffer.slice(4 + length - 5, 4 + length - 3).toString('hex');
   const suffix = buffer.slice(4 + length - 3, 4 + length - 1).toString('hex');
 
+  // Decodificar datos específicos del mensaje
+  const status = data.readUInt8(0);
+  const latitude = data.readUInt32BE(1) / 1000000; // Ejemplo de decodificación de latitud
+  const longitude = data.readUInt32BE(5) / 1000000; // Ejemplo de decodificación de longitud
+
   return {
     prefix,
     length,
     messageType,
-    data: data.toString('hex'),
+    status,
+    latitude,
+    longitude,
     checksum,
     suffix
   };
@@ -76,4 +83,4 @@ app.post('/send-command', (req, res) => {
 
 app.listen(PORT, () => {
   console.log(`Servidor HTTP escuchando en el puerto ${PORT}`);
-})
+});
