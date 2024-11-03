@@ -61,7 +61,7 @@ function decodeGT06Data(buffer) {
       suffix
     };
   }
-  
+}
 
 // Servidor TCP para el GPS
 const tcpServer = net.createServer((socket) => {
@@ -121,3 +121,4 @@ app.post('/send-command', (req, res) => {
 app.listen(PORT, () => {
   console.log(`Servidor HTTP escuchando en el puerto ${PORT}`);
 });
+//holasdczxvx
