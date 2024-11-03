@@ -1,6 +1,7 @@
 const net = require('net');
 const express = require('express');
 const bodyParser = require('body-parser');
+const fs = require('fs'); // Importar el módulo fs
 
 const PORT = 3000;
 const TCP_PORT = 4000;
@@ -17,7 +18,12 @@ const tcpServer = net.createServer((socket) => {
   gpsSocket = socket;
 
   socket.on('data', (data) => {
-    console.log('Datos recibidos del GPS:', data.toString());
+    // Guardar los datos recibidos en un archivo para análisis
+    fs.appendFileSync('gps_data.log', data);
+
+    // Imprimir los datos en la consola para análisis
+    console.log('Datos recibidos del GPS (raw):', data);
+    console.log('Datos recibidos del GPS (string):', data.toString());
   });
 
   socket.on('end', () => {
@@ -38,7 +44,7 @@ tcpServer.listen(TCP_PORT, HOST, () => {
 app.post('/send-command', (req, res) => {
   const command = req.body.command;
   if (gpsSocket) {
-    gpsSocket.write(command);
+    gpsSocket.write(command); // Enviar el comando al GPS utilizando el socket guardado
     res.status(200).send('Comando enviado al GPS');
   } else {
     res.status(500).send('GPS no conectado');
