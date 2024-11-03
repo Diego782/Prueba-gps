@@ -54,6 +54,7 @@ const tcpServer = net.createServer((socket) => {
 
     // Imprimir los datos en la consola para análisis
     console.log('Datos recibidos del GPS (raw):', data);
+    console.log('Datos recibidos del GPS (hex):', data.toString('hex'));
     console.log('Datos recibidos del GPS (string):', data.toString());
 
     // Decodificar los datos binarios del protocolo GT06
