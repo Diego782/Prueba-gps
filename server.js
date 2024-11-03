@@ -60,6 +60,10 @@ const tcpServer = net.createServer((socket) => {
     try {
       const decodedData = decodeGT06Data(data);
       console.log('Datos decodificados del GPS:', decodedData);
+
+      // Convertir los datos decodificados a JSON
+      const jsonData = JSON.stringify(decodedData);
+      console.log('Datos en formato JSON:', jsonData);
     } catch (err) {
       console.error('Error al decodificar los datos del GPS:', err.message);
     }
